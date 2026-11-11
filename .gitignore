@@ -1,0 +1,35 @@
+# Python virtual environments
+.venv/
+.venv*/
+venv/
+ENV/
+env/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+
+# Testing & logs
+*.log
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Antigravity & Agent scratch / cache
+.sharrowkin/
+.gemini/
+
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+
+# IDE & Editor settings
+.idea/
+.vscode/
+*.swp
+*.swo

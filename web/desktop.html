@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0b0d10">
+  <meta name="color-scheme" content="dark">
+  <title>Экран по QR — локальная панель</title>
+  <link rel="stylesheet" href="/assets/desktop.css">
+</head>
+<body>
+  <main class="desktop-page">
+    <header class="desktop-page__header">
+      <p class="desktop-page__eyebrow">Экран по QR</p>
+      <h1 class="desktop-page__title">Локальная панель управления</h1>
+      <p class="desktop-page__lead">
+        Выберите адрес компьютера в локальной сети и запустите сервер.
+        Подключите телефон по QR-коду. Передача видео требует доступного системного захвата.
+      </p>
+    </header>
+
+    <section class="desktop-panel" id="desktopPanel" data-status="stopped" aria-labelledby="desktopPanelTitle">
+      <h2 class="desktop-panel__title" id="desktopPanelTitle">Сервер</h2>
+
+      <div class="desktop-controls">
+        <label class="desktop-controls__field" for="desktop-address">
+          <span class="desktop-controls__label">Адрес в локальной сети</span>
+          <select class="desktop-controls__select" id="desktop-address" name="address" disabled>
+            <option value="">Загрузка адресов…</option>
+          </select>
+        </label>
+
+        <label class="desktop-controls__field" for="desktop-monitor">
+          <span class="desktop-controls__label">Экран для захвата</span>
+          <select class="desktop-controls__select" id="desktop-monitor" name="monitor" disabled>
+            <option value="">Загрузка экранов…</option>
+          </select>
+        </label>
+
+        <div class="desktop-controls__actions">
+          <button class="desktop-button desktop-button--primary" id="desktop-start" type="button" disabled>
+            Запустить
+          </button>
+          <button class="desktop-button" id="desktop-stop" type="button" disabled>
+            Остановить
+          </button>
+        </div>
+      </div>
+
+      <p class="desktop-status" id="desktop-status" role="status" aria-live="polite">
+        Проверяем состояние сервера…
+      </p>
+
+      <p class="desktop-error" id="desktop-error" role="alert" hidden></p>
+
+      <div class="desktop-pairing" id="desktop-pairing" hidden>
+        <div class="desktop-qr" id="desktop-qr">
+          <img
+            class="desktop-qr__image"
+            id="desktop-qr-image"
+            src=""
+            alt="QR-код для подключения телефона"
+            width="280"
+            height="280"
+            hidden
+          >
+        </div>
+        <div class="desktop-pairing__details">
+          <p class="desktop-pairing__label">Ссылка для телефона</p>
+          <p class="desktop-link" id="desktop-link"></p>
+          <p class="desktop-expiry" id="desktop-expiry"></p>
+        </div>
+      </div>
+
+      <p class="desktop-note">
+        Это зеркалирование экрана в браузере телефона, а не виртуальный монитор.
+        Если захват экрана в Windows недоступен, перенос QR-кода на другой компьютер
+        этого не исправит: проблему нужно решать на самом компьютере.
+      </p>
+    </section>
+
+    <section class="desktop-note" id="desktop-file-note">
+      <h2 class="desktop-note__title">Страница открыта не через сервер</h2>
+      <p>
+        Панель работает только через локальный сервер. Запустите в папке проекта:
+      </p>
+      <pre class="desktop-note__code"><code>python main.py --web</code></pre>
+      <p>
+        Затем откройте в браузере
+        <code class="desktop-note__inline">http://127.0.0.1:8766/desktop</code>.
+        Файл, открытый напрямую из проводника, не может загрузить оформление,
+        скрипт и данные — серверные маршруты работают только на локальном порту.
+      </p>
+    </section>
+  </main>
+
+  <script src="/assets/desktop.js" defer></script>
+</body>
+</html>

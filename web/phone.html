@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0d10">
+  <meta name="color-scheme" content="dark">
+  <title>Экран по QR</title>
+  <link rel="stylesheet" href="/assets/phone.css">
+</head>
+<body>
+  <main class="phone-app" id="phoneApp">
+    <video
+      class="phone-video"
+      id="phoneVideo"
+      autoplay
+      muted
+      playsinline
+      webkit-playsinline
+      preload="auto"
+    ></video>
+
+    <div class="phone-overlay" id="phoneOverlay" data-state="connecting">
+      <div class="phone-overlay__panel" role="dialog" aria-modal="false" aria-labelledby="title" aria-describedby="status">
+        <p class="phone-overlay__eyebrow" id="eyebrow">Экран по QR</p>
+        <h1 class="phone-overlay__title" id="title">Подключение к компьютеру</h1>
+        <p class="phone-status" id="status" role="status" aria-live="polite">Проверяем ссылку…</p>
+        <p class="phone-overlay__hint" id="hint" hidden></p>
+
+        <div class="phone-actions">
+          <button class="button button--primary is-hidden" id="playButton" type="button">Показать видео</button>
+          <button class="button is-hidden" id="fullscreenButton" type="button">На весь экран</button>
+          <button class="button is-hidden" id="leaveButton" type="button">Выйти из просмотра</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="phone-toolbar is-hidden" id="toolbar">
+      <span class="phone-toolbar__badge" id="liveBadge">В эфире</span>
+      <div class="phone-toolbar__actions">
+        <button class="button button--ghost is-hidden" id="zoomResetButtonMini" type="button">1.0x</button>
+        <button class="button button--ghost" id="fitButtonMini" type="button">Заполнить</button>
+        <button class="button button--ghost" id="mouseButtonMini" type="button">Мышь</button>
+        <button class="button button--ghost" id="fullscreenButtonMini" type="button">На весь экран</button>
+        <button class="button button--ghost" id="leaveButtonMini" type="button">Стоп</button>
+      </div>
+    </div>
+
+    <div class="phone-mouse-bar is-hidden" id="mouseBar" role="toolbar" aria-label="Управление мышью">
+      <button class="phone-mouse-btn" id="mouseBtnRight" type="button" title="Правый клик (ПКМ)">ПКМ</button>
+      <button class="phone-mouse-btn" id="mouseBtnDbl" type="button" title="Двойной клик">2x ЛКМ</button>
+      <button class="phone-mouse-btn" id="mouseBtnScrollUp" type="button" title="Прокрутка вверх">▲ Скролл</button>
+      <button class="phone-mouse-btn" id="mouseBtnScrollDown" type="button" title="Прокрутка вниз">▼ Скролл</button>
+    </div>
+
+    <p class="phone-sr-only" id="srStatus" role="status" aria-live="polite"></p>
+  </main>
+
+  <script src="/assets/phone.js" defer></script>
+</body>
+</html>

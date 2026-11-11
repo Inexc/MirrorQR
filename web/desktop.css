@@ -1,0 +1,437 @@
+/* Экран по QR — локальная панель управления (http://127.0.0.1:8766/desktop).
+   Только локальные ресурсы: без внешних шрифтов, CDN и изображений.
+   Токены повторяют web/phone.css, чтобы обе страницы выглядели одним продуктом. */
+
+:root {
+  --bg: #0b0d10;
+  --surface: #14181e;
+  --surface-2: #1b2129;
+  --surface-3: #232b35;
+  --border: #2a323d;
+  --border-strong: #3a4452;
+  --text: #f2f5f8;
+  --text-muted: #9aa6b4;
+  --accent: #2563eb;
+  --accent-hover: #2f6fdb;
+  --accent-text: #ffffff;
+  --danger: #ef4444;
+  --danger-text: #fca5a5;
+  --ok: #22c55e;
+  --warn: #f59e0b;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif;
+  --mono: ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas, "Liberation Mono",
+    monospace;
+  --focus: 2px solid #93c5fd;
+  --focus-offset: 2px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Скрытие через атрибут hidden: не занимает место и не рисуется,
+   даже если у элемента задан display. */
+[hidden] {
+  display: none !important;
+}
+
+/* ---------- Каркас ---------- */
+
+.desktop-page {
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  overflow-x: hidden;
+  background:
+    radial-gradient(120% 70% at 50% 0%, #151b24 0%, #0b0d10 60%);
+}
+
+.desktop-panel {
+  width: 100%;
+  max-width: 720px;
+  min-width: 0;
+  padding: var(--space-5);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  overflow-wrap: anywhere;
+}
+
+/* Полоса статуса сверху панели: цвет + текст, а не только цвет. */
+.desktop-panel[data-status="starting"] {
+  border-top: 3px solid var(--warn);
+}
+
+.desktop-panel[data-status="running"] {
+  border-top: 3px solid var(--ok);
+}
+
+.desktop-panel[data-status="stopping"] {
+  border-top: 3px solid var(--warn);
+}
+
+.desktop-panel[data-status="error"] {
+  border-top: 3px solid var(--danger);
+}
+
+/* ---------- Управление ---------- */
+
+.desktop-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.desktop-controls label {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.desktop-controls select {
+  width: 100%;
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.desktop-controls select:focus-visible {
+  outline: var(--focus);
+  outline-offset: var(--focus-offset);
+}
+
+.desktop-controls button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 160ms ease-out, border-color 160ms ease-out,
+    transform 160ms ease-out;
+}
+
+.desktop-controls button:hover:not(:disabled) {
+  background: var(--surface-3);
+}
+
+.desktop-controls button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.desktop-controls button:focus-visible {
+  outline: var(--focus);
+  outline-offset: var(--focus-offset);
+}
+
+.desktop-controls button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Первая кнопка — основное действие запуска. */
+.desktop-controls button:first-of-type {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.desktop-controls button:first-of-type:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+/* ---------- Статус и ошибка ---------- */
+
+.desktop-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.desktop-status::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--text-muted);
+}
+
+.desktop-panel[data-status="starting"] .desktop-status::before,
+.desktop-panel[data-status="stopping"] .desktop-status::before {
+  background: var(--warn);
+  animation: desktop-pulse 1.2s ease-in-out infinite;
+}
+
+.desktop-panel[data-status="running"] .desktop-status::before {
+  background: var(--ok);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.desktop-panel[data-status="error"] .desktop-status::before {
+  background: var(--danger);
+}
+
+@keyframes desktop-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+/* Ошибка: рамка, фон, значок и жирный текст — не только цвет. */
+.desktop-error {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--danger);
+  border-left-width: 4px;
+  border-radius: var(--radius-sm);
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--danger-text);
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.desktop-error::before {
+  content: "!";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-right: var(--space-2);
+  border-radius: 50%;
+  background: var(--danger);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: 1px;
+}
+
+/* ---------- Подключение: QR и ссылка ---------- */
+
+.desktop-pairing {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--space-5);
+  min-width: 0;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.desktop-qr {
+  flex: 0 0 auto;
+  width: 232px;
+  height: auto;
+  max-width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  /* Модули QR остаются резкими, без размытия при масштабировании. */
+  image-rendering: pixelated;
+}
+
+/* SVG от сервера вписывается в квадрат и не обрезается. */
+.desktop-qr svg,
+.desktop-qr img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.desktop-link {
+  flex: 1 1 240px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.desktop-link a {
+  color: #93c5fd;
+  font-family: var(--mono);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.desktop-link a:hover {
+  color: #bfdbfe;
+}
+
+.desktop-link a:focus-visible {
+  outline: var(--focus);
+  outline-offset: var(--focus-offset);
+  border-radius: 2px;
+}
+
+.desktop-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+/* Согласование с вложенной разметкой панели. */
+.desktop-page__header { width: 100%; max-width: 720px; }
+.desktop-page__eyebrow { margin: 0 0 8px; color: var(--text-muted); }
+.desktop-page__title { margin: 0 0 16px; font-size: 32px; line-height: 1.2; font-weight: 600; }
+.desktop-page__lead { margin: 0; max-width: 65ch; color: var(--text-muted); }
+.desktop-panel__title { margin: 0; font-size: 20px; font-weight: 600; }
+.desktop-controls__field { flex: 1 1 240px; min-width: 0; }
+.desktop-controls__label { display: block; margin-bottom: 8px; }
+.desktop-controls__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.desktop-pairing__details { flex: 1 1 240px; min-width: 0; }
+.desktop-pairing__label { margin: 0 0 8px; font-weight: 600; }
+.desktop-link { display: block; margin: 0; color: #93c5fd; font-family: var(--mono); font-size: 14px; overflow-wrap: anywhere; }
+.desktop-expiry { font-size: 14px; color: var(--text-muted); }
+#desktop-file-note { width: 100%; max-width: 720px; }
+
+/* ---------- Узкие экраны ---------- */
+
+@media (max-width: 640px) {
+  .desktop-page {
+    padding: var(--space-4) var(--space-3);
+    gap: var(--space-4);
+  }
+
+  .desktop-panel {
+    padding: var(--space-4);
+  }
+
+  .desktop-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .desktop-controls__field { flex-basis: auto; }
+  .desktop-controls__actions { flex-direction: column; }
+  .desktop-controls button {
+    width: 100%;
+  }
+
+  .desktop-pairing {
+    gap: var(--space-4);
+  }
+
+  .desktop-qr {
+    width: 100%;
+    max-width: 232px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 360px) {
+  .desktop-page {
+    padding: var(--space-3) var(--space-2);
+  }
+
+  .desktop-panel {
+    padding: var(--space-3);
+  }
+
+  .desktop-controls button {
+    padding: 0 var(--space-3);
+  }
+
+  .desktop-qr {
+    max-width: 200px;
+  }
+
+  .desktop-link a {
+    font-size: 13px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .desktop-panel[data-status="starting"] .desktop-status::before,
+  .desktop-panel[data-status="stopping"] .desktop-status::before {
+    animation: none;
+  }
+}

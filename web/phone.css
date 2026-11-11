@@ -1,0 +1,469 @@
+/* Экран по QR — мобильная страница просмотра.
+   Только локальные ресурсы: без внешних шрифтов, CDN и изображений. */
+
+:root {
+  --bg: #0b0d10;
+  --surface: #14181e;
+  --surface-2: #1b2129;
+  --border: #2a323d;
+  --text: #f2f5f8;
+  --text-muted: #9aa6b4;
+  --accent: #3b82f6;
+  --accent-hover: #2f6fdb;
+  --accent-text: #ffffff;
+  --danger: #ef4444;
+  --ok: #22c55e;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  width: 100%;
+  max-width: 100vw;
+  overscroll-behavior: none;
+}
+
+.is-hidden {
+  display: none !important;
+}
+
+/* Только для скринридеров: объявления о смене состояния. */
+.phone-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Каркас ---------- */
+
+.phone-app {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  height: 100dvh;
+  max-width: 100vw;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phone-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  background: #000;
+  outline: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transform-origin: center center;
+  will-change: transform;
+}
+
+.phone-video.is-covered {
+  object-fit: cover;
+}
+
+.phone-app.is-pseudo-fullscreen {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 99999 !important;
+}
+
+.phone-app.is-streaming .phone-video {
+  cursor: none;
+}
+
+/* ---------- Оверлей состояний ---------- */
+
+.phone-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--space-5) + var(--safe-top)) calc(var(--space-4) + var(--safe-right))
+    calc(var(--space-5) + var(--safe-bottom)) calc(var(--space-4) + var(--safe-left));
+  background:
+    radial-gradient(120% 80% at 50% 0%, #151b24 0%, #0b0d10 60%);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  z-index: 2;
+  /* Не перехватывает нажатия по видео и кнопке под ним: интерактивна только панель. */
+  pointer-events: none;
+}
+
+.phone-overlay[hidden] {
+  display: none;
+}
+
+.phone-overlay__panel {
+  width: 100%;
+  max-width: 420px;
+  margin: auto;
+  padding: var(--space-5) var(--space-4);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+  /* Кликабельны только панель и её кнопки; сам оверлей пропускает нажатия. */
+  pointer-events: auto;
+}
+
+.phone-overlay__eyebrow {
+  margin: 0 0 var(--space-2);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.phone-overlay__title {
+  margin: 0 0 var(--space-3);
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.phone-status {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.phone-overlay__hint {
+  margin: var(--space-3) 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.phone-overlay[data-state="error"] .phone-overlay__panel {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.phone-overlay[data-state="error"] .phone-overlay__title {
+  color: #fca5a5;
+}
+
+.phone-overlay[data-state="ended"] .phone-overlay__title {
+  color: var(--text);
+}
+
+.phone-overlay[data-state="connecting"] .phone-status::after {
+  content: "";
+  display: inline-block;
+  width: 1.2em;
+  text-align: left;
+  animation: phone-dots 1.2s steps(4, end) infinite;
+}
+
+@keyframes phone-dots {
+  0% {
+    content: "";
+  }
+  25% {
+    content: ".";
+  }
+  50% {
+    content: "..";
+  }
+  75% {
+    content: "...";
+  }
+  100% {
+    content: "";
+  }
+}
+
+/* ---------- Кнопки ---------- */
+
+.phone-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-5);
+}
+
+.button {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 var(--space-5);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 160ms ease-out, border-color 160ms ease-out,
+    transform 160ms ease-out;
+}
+
+.button:hover {
+  background: #232b35;
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.button--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.button--primary:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.button--ghost {
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  background: rgba(20, 24, 30, 0.72);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: var(--text);
+  font-size: 14px;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.button--active {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
+}
+
+/* ---------- Плавающая панель во время трансляции ---------- */
+
+.phone-toolbar {
+  position: absolute;
+  left: calc(var(--space-3) + var(--safe-left));
+  right: calc(var(--space-3) + var(--safe-right));
+  top: calc(var(--space-3) + var(--safe-top));
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  background: rgba(11, 13, 16, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: opacity 200ms ease-out, transform 200ms ease-out;
+}
+
+.phone-toolbar.is-dimmed {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-12px);
+}
+
+.phone-toolbar__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.phone-toolbar__badge::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--ok);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.phone-toolbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ---------- Панель управления мышью ---------- */
+
+.phone-mouse-bar {
+  position: absolute;
+  left: 50%;
+  bottom: calc(var(--space-3) + var(--safe-bottom));
+  transform: translateX(-50%);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(11, 13, 16, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.phone-mouse-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0 12px;
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background-color 140ms ease-out, border-color 140ms ease-out, transform 140ms ease-out;
+}
+
+.phone-mouse-btn:active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  transform: scale(0.96);
+}
+
+/* ---------- Поворот и небольшие экраны ---------- */
+
+@media (orientation: landscape) and (max-height: 480px) {
+  .phone-overlay {
+    padding: calc(var(--space-3) + var(--safe-top)) calc(var(--space-4) + var(--safe-right))
+      calc(var(--space-3) + var(--safe-bottom)) calc(var(--space-4) + var(--safe-left));
+  }
+
+  .phone-overlay__panel {
+    max-width: 560px;
+    padding: var(--space-4);
+  }
+
+  .phone-overlay__title {
+    font-size: 18px;
+    margin-bottom: var(--space-2);
+  }
+
+  .phone-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: var(--space-4);
+  }
+
+  .phone-actions .button {
+    flex: 1 1 180px;
+  }
+}
+
+@media (max-width: 360px) {
+  .phone-overlay__panel {
+    padding: var(--space-4) var(--space-3);
+  }
+
+  .phone-overlay__title {
+    font-size: 20px;
+  }
+
+  .button {
+    padding: 0 var(--space-4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+
+  .phone-overlay[data-state="connecting"] .phone-status::after {
+    content: "…";
+    animation: none;
+  }
+}
