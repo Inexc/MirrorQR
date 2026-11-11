@@ -1,6 +1,6 @@
-# 📱 TranSlipt — Экран по QR
+# 📱 MirrorQR — Экран по QR
 
-[![GitHub](https://img.shields.io/badge/GitHub-TranSlipt-181717?logo=github)](https://github.com/Inexc/TranSlipt)
+[![GitHub](https://img.shields.io/badge/GitHub-MirrorQR-181717?logo=github)](https://github.com/Inexc/MirrorQR)
 [![Telegram](https://img.shields.io/badge/Telegram-@inexcdemo-2CA5E0?logo=telegram&logoColor=white)](https://t.me/inexcdemo)
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -61,8 +61,8 @@
 Клонируйте репозиторий и установите зависимости:
 
 ```bash
-git clone https://github.com/Inexc/TranSlipt.git
-cd TranSlipt
+git clone https://github.com/Inexc/MirrorQR.git
+cd MirrorQR
 
 # Создание виртуального окружения (Python 3.13)
 py -3.13 -m venv .venv
@@ -118,7 +118,7 @@ python main.py
 ## 📁 Структура проекта
 
 ```text
-TranSlipt/
+MirrorQR/
 ├── main.py                  # Единая точка входа (--web или Qt GUI)
 ├── start-web.bat            # Быстрый запуск веб-панели в один клик
 ├── start-gui.bat            # Быстрый запуск Qt-окна в один клик
