@@ -1,5 +1,10 @@
 # 📱 TranSlipt — Экран по QR
 
+[![GitHub](https://img.shields.io/badge/GitHub-TranSlipt-181717?logo=github)](https://github.com/Inexc/TranSlipt)
+[![Telegram](https://img.shields.io/badge/Telegram-@inexcdemo-2CA5E0?logo=telegram&logoColor=white)](https://t.me/inexcdemo)
+[![Python 3.13+](https://img.shields.io/badge/python-3.13+-3776AB.svg?logo=python&logoColor=white)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 > Быстрая беспроводная трансляция экрана компьютера на телефон по локальной сети через **WebRTC** — без установки сторонних приложений на мобильное устройство, с интерактивным масштабированием и удалённым управлением мышью.
 
 ---
@@ -180,6 +185,12 @@ python src/integration/check_panel_lifecycle.py
 # 6. Сквозная проверка WebRTC-сигналинга и фабрики захвата
 python src/integration/check_runtime.py
 ```
+
+---
+
+## 💬 Сообщество и связь
+
+* Telegram-канал проекта: [@inexcdemo](https://t.me/inexcdemo)
 
 ---
 
